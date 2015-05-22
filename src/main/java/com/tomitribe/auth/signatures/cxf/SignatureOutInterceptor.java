@@ -63,7 +63,7 @@ public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
 
     @Override
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(final Message message) throws Fault {
 
         Map<String, List<String>> headers = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
         if (headers == null) {
