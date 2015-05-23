@@ -97,16 +97,16 @@ public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
         final URL url;
         try {
-            url = new URL(message.get("org.apache.cxf.request.uri").toString());
-
+            url = new URL(message.get(Message.REQUEST_URI).toString());
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }
 
         try {
+            final String uri = url.getFile();
             return sign(
-                    message.get("org.apache.cxf.request.method").toString(),
-                    url.getPath(),
+                    message.get(Message.HTTP_REQUEST_METHOD).toString(),
+                    uri,
                     Headers.getSetProtocolHeaders(message));
 
         } catch (final NoSuchAlgorithmException | InvalidKeyException | IOException e) {

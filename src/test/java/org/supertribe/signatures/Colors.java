@@ -9,6 +9,8 @@
  */
 package org.supertribe.signatures;
 
+import org.apache.openejb.util.Join;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
@@ -17,6 +19,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 @Path("colors")
 @Singleton
@@ -27,6 +30,12 @@ public class Colors {
     @Path("preferred")
     public String preferred() {
         return "orange";
+    }
+
+    @GET
+    @Path("hsb")
+    public String hsb(@QueryParam("hue") short hue, @QueryParam("saturation") float saturation, @QueryParam("brightness") float brightness) {
+        return Join.join(":", hue, saturation, brightness);
     }
 
     @POST

@@ -17,6 +17,7 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.tomitribe.util.IO;
@@ -80,6 +81,34 @@ public class ColorsTest {
                 .get(String.class);
 
         assertEquals("orange", actual);
+    }
+
+    /**
+     * Tests accessing a signatures protected method with a GET request
+     *
+     * @throws Exception when test fails or an error occurs
+     */
+    @Test
+    @Ignore
+    public void successQueryParams() throws Exception {
+
+        final WebClient webClient = HttpSignatures.httpSignatureClient(
+                webapp.toExternalForm(),
+                DIGEST_ALGORITHM,
+                KeystoreInitializer.SECRET,
+                KeystoreInitializer.ALGO,
+                KeystoreInitializer.KEY_ALIAS,
+                SIGNATURE_HEADERS);
+
+        final String actual = webClient
+                .path("api/colors")
+                .path("hsb")
+                .query("hue", "330")
+                .query("saturation", "0.50")
+                .query("brightness", "0.80")
+                .get(String.class);
+
+        assertEquals("330:0.5:0.8", actual);
     }
 
     /**
