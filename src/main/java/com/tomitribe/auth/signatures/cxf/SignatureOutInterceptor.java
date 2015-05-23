@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Technical CXF interceptor responsible for calculating the HTTP Signature and
@@ -63,11 +62,7 @@ public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
     @Override
     public void handleMessage(final Message message) throws Fault {
 
-        Map<String, List<String>> headers = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
-        if (headers == null) {
-            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            message.put(Message.PROTOCOL_HEADERS, headers);
-        }
+        Map<String, List<String>> headers = Messages.getHeaders(message);
 
         // if Digest is used, force the stream to close so that the digest header gets added and no one
         // else can change it

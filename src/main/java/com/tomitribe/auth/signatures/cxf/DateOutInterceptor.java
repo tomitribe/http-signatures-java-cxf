@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Technical CXF interceptor to fill it automatically the date in the header.
@@ -41,11 +40,7 @@ public class DateOutInterceptor extends AbstractPhaseInterceptor<Message> {
     @Override
     public void handleMessage(Message message) throws Fault {
 
-        Map<String, List<String>> headers = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
-        if (headers == null) {
-            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            message.put(Message.PROTOCOL_HEADERS, headers);
-        }
+        Map<String, List<String>> headers = Messages.getHeaders(message);
 
         final String dateFormatPattern = "EEE, dd MMM yyyy HH:mm:ss zzz";
         final String dateHeaderKey = "Date";

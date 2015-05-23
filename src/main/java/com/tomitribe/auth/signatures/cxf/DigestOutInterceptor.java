@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,13 +76,9 @@ public class DigestOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 @Override
                 public void close() throws IOException {
 
-                    byte digest[] = getMessageDigest().digest();
+                    final byte digest[] = getMessageDigest().digest();
 
-                    Map<String, List<String>> headers = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
-                    if (headers == null) {
-                        headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-                        message.put(Message.PROTOCOL_HEADERS, headers);
-                    }
+                    Map<String, List<String>> headers = Messages.getHeaders(message);
 
                     final String digestHeaderKey = "Digest";
                     final String base64EncodedDigest = getMessageDigest().getAlgorithm() + "=" + new String(Base64.encodeBase64(digest));
