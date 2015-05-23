@@ -39,7 +39,7 @@ import java.util.TreeMap;
  */
 public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private Signer signer;
+    private final Signer signer;
 
     public SignatureOutInterceptor(final String phase,
                                    final Key key, final String keyAlias, final String algorithm, final String headers) {
