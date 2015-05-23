@@ -39,10 +39,7 @@ import java.util.TreeMap;
  */
 public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private final Key key;
-    private final String keyAlias;
-    private final Algorithm algorithm;
-    private final String consideredHeaders;
+    private Signer signer;
 
     public SignatureOutInterceptor(final String phase,
                                    final Key key, final String keyAlias, final String algorithm, final String headers) {
@@ -51,10 +48,11 @@ public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
         addBefore(StaxOutInterceptor.class.getName());
         addAfter(DigestOutInterceptor.class.getName());
 
-        this.key = key;
-        this.keyAlias = keyAlias;
-        this.algorithm = Algorithm.get(algorithm);
-        this.consideredHeaders = headers;
+
+        final String[] headerList = headers.split(" ");
+        final Signature signature = new Signature(keyAlias, Algorithm.get(algorithm), null, headerList);
+        signer = new Signer(key, signature);
+
     }
 
     public SignatureOutInterceptor(final Key key, final String keyAlias, final String algorithm, final String headers) {
@@ -115,10 +113,6 @@ public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private String sign(final String method, final String uri, final Map<String, List<String>> headers) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-
-        final String[] headerList = consideredHeaders.split(" ");
-        final Signature signature = new Signature(keyAlias, algorithm, null, headerList);
-        final Signer signer = new Signer(key, signature);
 
         final Map<String, String> h = new HashMap<>(headers != null ? headers.size() : 0);
         if (headers != null) {
