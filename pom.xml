@@ -82,6 +82,13 @@
       <version>${tribestream.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.tomitribe.tribestream</groupId>
+      <artifactId>tribestream</artifactId>
+      <version>${tribestream.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
