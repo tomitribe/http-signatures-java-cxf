@@ -10,9 +10,9 @@
 package org.supertribe.signatures;
 
 import com.tomitribe.auth.signatures.cxf.HttpSignatures;
-import com.tomitribe.auth.signatures.cxf.feature.SecurityFeature;
 import com.tomitribe.auth.signatures.cxf.feature.DateFeature;
 import com.tomitribe.auth.signatures.cxf.feature.DigestFeature;
+import com.tomitribe.auth.signatures.cxf.feature.SecurityFeature;
 import com.tomitribe.auth.signatures.cxf.feature.SignatureFeature;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -49,14 +49,9 @@ public class ColorsTest {
      */
     @Deployment(testable = false)
     public static WebArchive war() throws Exception {
-
-        final WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "colors.war")
+        return ShrinkWrap.create(WebArchive.class, "colors.war")
                 .addPackages(true, "org.supertribe.signatures")
                 .addAsManifestResource(new ClassLoaderAsset("META-INF/context.xml"), "context.xml");
-
-        System.out.println(webArchive.toString(true));
-
-        return webArchive;
     }
 
     /**

@@ -1,0 +1,21 @@
+<!--
+  ~ Tomitribe Confidential
+  ~
+  ~ Copyright(c) Tomitribe Corporation. 2015
+  ~
+  ~ The source code for this program is not published or otherwise divested
+  ~ of its trade secrets, irrespective of what has been deposited with the
+  ~ U.S. Copyright Office.
+  -->
+
+<Context PreemptiveAuthentication="true">
+  <Valve className="com.tomitribe.tribestream.security.signatures.SignatureAuthenticator"
+         headers="(request-target) date digest" algorithm="hmac-sha256" />
+  <Valve className="com.tomitribe.tribestream.security.date.DateValidationValve"
+         validRange="30 seconds" requireHeader="true" />
+  <Realm className="com.tomitribe.tribestream.security.signatures.SignatureJAASRealm"
+         appName="test-realm" keystoreFile="${catalina.home}/conf/AllColorsTest.jks" keystorePass="changeit"
+         configFile="jaas.config"
+         userClassNames="org.apache.openejb.core.security.jaas.UserPrincipal"
+         roleClassNames="org.apache.openejb.core.security.jaas.GroupPrincipal" />
+</Context>

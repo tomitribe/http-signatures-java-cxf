@@ -26,16 +26,9 @@ import java.util.Map;
  * Technical CXF interceptor to fill it automatically the date in the header.
  */
 public class DateOutInterceptor extends AbstractPhaseInterceptor<Message> {
-
-    public DateOutInterceptor(final String phase) {
-        super(phase);
-        addBefore(DigestOutInterceptor.class.getName());
-    }
-
     public DateOutInterceptor() {
-        this(Phase.PRE_STREAM);
+        super(Phase.PRE_STREAM);
     }
-
 
     @Override
     public void handleMessage(Message message) throws Fault {
