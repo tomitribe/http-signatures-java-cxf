@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public enum Messages {
-    ;
-
+public final class Messages {
     public static Map<String, List<String>> getHeaders(Message message) {
 
         final Map<String, List<String>> a = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
@@ -26,5 +24,9 @@ public enum Messages {
         final Map<String, List<String>> b = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         message.put(Message.PROTOCOL_HEADERS, b);
         return b;
+    }
+
+    private Messages() {
+        // no-op
     }
 }
