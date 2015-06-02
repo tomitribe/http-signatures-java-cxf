@@ -7,7 +7,7 @@
  * of its trade secrets, irrespective of what has been deposited with the 
  * U.S. Copyright Office.
  */
-package com.tomitribe.auth.signatures.cxf;
+package com.tomitribe.auth.signatures.cxf.internal;
 
 import org.apache.cxf.message.Message;
 

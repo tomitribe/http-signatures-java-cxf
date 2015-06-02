@@ -9,7 +9,7 @@
  */
 package com.tomitribe.auth.signatures.cxf.feature;
 
-import com.tomitribe.auth.signatures.cxf.DateOutInterceptor;
+import com.tomitribe.auth.signatures.cxf.interceptor.DateOutInterceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;

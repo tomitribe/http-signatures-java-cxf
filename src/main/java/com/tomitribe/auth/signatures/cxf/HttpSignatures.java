@@ -10,6 +10,8 @@
 
 package com.tomitribe.auth.signatures.cxf;
 
+import com.tomitribe.auth.signatures.cxf.interceptor.DateOutInterceptor;
+import com.tomitribe.auth.signatures.cxf.interceptor.SignatureOutInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -17,7 +19,21 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * This is a utility class to get a CXF WebClient and properly configure the
  * out interceptors responsible for including Date, Digest and HTTP Signature headers.
+ *
+ * @deprecated either use {@see org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean}
+ * or directly {@see org.apache.cxf.jaxrs.client.WebClient} with features
+ *
+ * Example:
+ *
+ * final JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+ * bean.setThreadSafe(true);
+ * bean.setAddress(endpoint);
+ * bean.setProvider(new JohnzonProvider());
+ * bean.getFeatures().add(new SecurityFeature(digest, secret, alias, algorithm, headers));
+ * client = bean.createWebClient();
+ *
  */
+@Deprecated
 public class HttpSignatures {
 
     private HttpSignatures() {

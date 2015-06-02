@@ -9,7 +9,6 @@
  */
 package com.tomitribe.auth.signatures.cxf.internal;
 
-import com.tomitribe.auth.signatures.cxf.Messages;
 import org.apache.cxf.message.Message;
 import org.tomitribe.auth.signatures.Base64;
 

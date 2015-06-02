@@ -8,8 +8,9 @@
  * U.S. Copyright Office.
  */
 
-package com.tomitribe.auth.signatures.cxf;
+package com.tomitribe.auth.signatures.cxf.interceptor;
 
+import com.tomitribe.auth.signatures.cxf.internal.Messages;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
