@@ -15,30 +15,41 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Technical CXF interceptor to fill it automatically the date in the header.
  */
 public class DateOutInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static final String DATE_HEADER = "Date";
+
+    // Avoid to leak if in a webapp
+    private final Queue<DateFormat> dateFormats = new ConcurrentLinkedQueue<>();
+
     public DateOutInterceptor() {
         super(Phase.PRE_STREAM);
     }
 
     @Override
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(final Message message) throws Fault {
+        final DateFormat format = format();
+        try {
+            final String date = format.format(new Date());
+            Messages.getHeaders(message).put(DATE_HEADER, singletonList(date));
+        } finally {
+            dateFormats.add(format);
+        }
+    }
 
-        Map<String, List<String>> headers = Messages.getHeaders(message);
-
-        final String dateFormatPattern = "EEE, dd MMM yyyy HH:mm:ss zzz";
-        final String dateHeaderKey = "Date";
-
-        final String date = new SimpleDateFormat(dateFormatPattern, Locale.US).format(new Date());
-        headers.put(dateHeaderKey, Arrays.asList(date));
+    private DateFormat format() {
+        final DateFormat format = dateFormats.poll();
+        return format != null ? format : new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
     }
 }
