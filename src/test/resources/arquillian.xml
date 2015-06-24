@@ -8,30 +8,13 @@
   ~ of its trade secrets, irrespective of what has been deposited with the
   ~ U.S. Copyright Office.
   -->
-
-<!--
-Optional file.  Allows us to use random ports when running tests.
-The ports are communicated to the test via the @ArquillianResource annotation
-
-
-  @RunWith(Arquillian.class)
-  public class ColorBeanTest {
-
-      @ArquillianResource
-      private URL webappUrl;
-
-      // ....
-  }
-
-If this file is deleted the default Tomcat 8080 port is used
--->
 <arquillian>
   <container qualifier="tomee" default="true">
     <configuration>
       <property name="groupId">com.tomitribe.tribestream</property>
       <property name="artifactId">tribestream</property>
       <property name="version">${tribestream.version}</property>
-      <property name="classifier"></property>
+      <property name="classifier" />
       <property name="removeUnusedWebapps">true</property>
       <property name="httpsPort">-1</property>
       <property name="httpPort">-1</property>
@@ -39,7 +22,6 @@ If this file is deleted the default Tomcat 8080 port is used
       <property name="ajpPort">-1</property>
       <property name="cleanOnStartUp">true</property>
       <property name="simpleLog">true</property>
-      <!-- if logging.properties is provided in conf/ then it is ignored -->
       <property name="dir">target/tribestream-remote</property>
       <property name="appWorkingDir">target/arquillian-test-working-dir</property>
       <property name="conf">src/test/conf</property>

@@ -8,8 +8,10 @@
  * U.S. Copyright Office.
  */
 
-package com.tomitribe.auth.signatures.cxf;
+package com.tomitribe.auth.signatures.cxf.interceptor;
 
+import com.tomitribe.auth.signatures.cxf.internal.Messages;
+import com.tomitribe.auth.signatures.cxf.internal.TwoPhaseCloseDigestOutputStream;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Message;
@@ -20,10 +22,11 @@ import org.tomitribe.auth.signatures.Algorithm;
 import org.tomitribe.auth.signatures.Signature;
 import org.tomitribe.auth.signatures.Signer;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.DigestOutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -37,45 +40,54 @@ import java.util.Map;
  * adding it automatically to the headers.
  */
 public class SignatureOutInterceptor extends AbstractPhaseInterceptor<Message> {
-
     private final Signer signer;
 
-    public SignatureOutInterceptor(final String phase,
-                                   final Key key, final String keyAlias, final String algorithm, final String headers) {
-
-        super(phase);
+    public SignatureOutInterceptor(final Key key, final String keyAlias, final String algorithm, final String headers) {
+        super(Phase.MARSHAL);
         addBefore(StaxOutInterceptor.class.getName());
+        addAfter(DateOutInterceptor.class.getName());
         addAfter(DigestOutInterceptor.class.getName());
 
 
         final String[] headerList = headers.split(" ");
         final Signature signature = new Signature(keyAlias, Algorithm.get(algorithm), null, headerList);
         signer = new Signer(key, signature);
-
-    }
-
-    public SignatureOutInterceptor(final Key key, final String keyAlias, final String algorithm, final String headers) {
-        this(Phase.MARSHAL, key, keyAlias, algorithm, headers);
     }
 
 
     @Override
     public void handleMessage(final Message message) throws Fault {
-
-        Map<String, List<String>> headers = Messages.getHeaders(message);
-
-        // if Digest is used, force the stream to close so that the digest header gets added and no one
-        // else can change it
-        final DigestOutputStream dos = (DigestOutputStream) message.get("digest.stream");
-        if (dos != null) {
-            try {
-                dos.close();
-            } catch (final IOException e) {
-                throw new IllegalStateException(e);
+        final OutputStream out = message.getContent(OutputStream.class);
+        final OutputStream dos = new FilterOutputStream(out) {
+            @Override
+            public void write(final byte[] b, final int off, final int len) throws IOException {
+                out.write(b, off, len);
             }
-        }
 
-        headers.put("Authorization", Arrays.asList(getAuthorization(message)));
+            @Override
+            public void write(final byte[] b) throws IOException {
+                out.write(b);
+            }
+
+            @Override
+            public void close() throws IOException {
+                final Map<String, List<String>> headers = Messages.getHeaders(message);
+
+                // if Digest is used, force the stream to close so that the digest header gets added and no one
+                // else can change it
+                final TwoPhaseCloseDigestOutputStream dos = TwoPhaseCloseDigestOutputStream.class.cast(message.get("digest.stream"));
+                if (dos != null) {
+                    dos.addDigestHeader();
+                }
+
+                headers.put("Authorization", Arrays.asList(getAuthorization(message)));
+                super.close();
+            }
+
+        };
+
+        message.setContent(OutputStream.class, dos);
+
     }
 
     private String getAuthorization(final Message message) {

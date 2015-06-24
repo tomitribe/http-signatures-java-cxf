@@ -10,6 +10,11 @@
 package org.supertribe.signatures;
 
 import com.tomitribe.auth.signatures.cxf.HttpSignatures;
+import com.tomitribe.auth.signatures.cxf.feature.DateFeature;
+import com.tomitribe.auth.signatures.cxf.feature.DigestFeature;
+import com.tomitribe.auth.signatures.cxf.feature.SecurityFeature;
+import com.tomitribe.auth.signatures.cxf.feature.SignatureFeature;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -25,7 +30,9 @@ import org.tomitribe.util.IO;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Arquillian.class)
@@ -42,14 +49,9 @@ public class ColorsTest {
      */
     @Deployment(testable = false)
     public static WebArchive war() throws Exception {
-
-        final WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "colors.war")
+        return ShrinkWrap.create(WebArchive.class, "colors.war")
                 .addPackages(true, "org.supertribe.signatures")
                 .addAsManifestResource(new ClassLoaderAsset("META-INF/context.xml"), "context.xml");
-
-        System.out.println(webArchive.toString(true));
-
-        return webArchive;
     }
 
     /**
@@ -74,6 +76,51 @@ public class ColorsTest {
                 KeystoreInitializer.ALGO,
                 KeystoreInitializer.KEY_ALIAS,
                 SIGNATURE_HEADERS);
+
+        final String actual = webClient
+                .path("api/colors")
+                .path("preferred")
+                .get(String.class);
+
+        assertEquals("orange", actual);
+    }
+
+    @Test
+    public void features() throws Exception {
+
+        final WebClient webClient = WebClient.create(
+                webapp.toExternalForm(),
+                Collections.emptyList(),
+                asList(new SignatureFeature(
+                            KeystoreInitializer.SECRET,
+                            KeystoreInitializer.KEY_ALIAS,
+                            KeystoreInitializer.ALGO,
+                            SIGNATURE_HEADERS),
+                        new DigestFeature(DIGEST_ALGORITHM),
+                        new DateFeature()),
+                null);
+
+        final String actual = webClient
+                .path("api/colors")
+                .path("preferred")
+                .get(String.class);
+
+        assertEquals("orange", actual);
+    }
+
+    @Test
+    public void feature() throws Exception {
+
+        final WebClient webClient = WebClient.create(
+                webapp.toExternalForm(),
+                Collections.emptyList(),
+                Collections.<AbstractFeature>singletonList(new SecurityFeature(
+                        DIGEST_ALGORITHM,
+                        KeystoreInitializer.SECRET,
+                        KeystoreInitializer.KEY_ALIAS,
+                        KeystoreInitializer.ALGO,
+                        SIGNATURE_HEADERS)),
+                null);
 
         final String actual = webClient
                 .path("api/colors")
